@@ -76,7 +76,7 @@ class SCC_Share_Facebook_Strategy extends SCC_Crawl_Strategy {
 	public function build_query_url() {
 		SCC_Common_Util::log( '[' . __METHOD__ . '] (line='. __LINE__ . ')' );
 
-		$url = self::DEF_BASE_URL . '?id='. rawurlencode($this->query_parameters['id']) . '&fields=og_object{engagement},engagement&access_token=' . $this->query_parameters['access_token'];
+		$url = self::DEF_BASE_URL . '?' . http_build_query( $this->query_parameters , '' , '&' );
 
 		return $url;
 	}
@@ -92,17 +92,17 @@ class SCC_Share_Facebook_Strategy extends SCC_Crawl_Strategy {
 		$count = (int) -1;
 
 		if ( isset( $content['data'] ) && empty( $content['error'] ) ) {
-		  $json = json_decode( $content['data'], true );
+			$json = json_decode( $content['data'], true );
 
-		  if ( isset( $json['og_object']['engagement']['count'] ) && is_numeric( $json['og_object']['engagement']['count'] ) ) { 
-		    $count = (int) $json['og_object']['engagement']['count'];
-		  } elseif ( isset( $json['id'] ) && ! isset( $json['og_object']['engagement']['count'] ) ) { 
-		    $count = (int) 0;
-		  } else {
-		    $count = (int) -1;
-		  }
+			if ( isset( $json['share']['share_count'] ) && is_numeric( $json['share']['share_count'] ) ) {
+				$count = (int) $json['share']['share_count'];
+			} elseif ( isset( $json['id'] ) && ! isset( $json['share']['share_count'] ) ) {
+				$count = (int) 0;
+			} else {
+				$count = (int) -1;
+			}
 		} else {
-		  $count = (int) -1;
+			$count = (int) -1;
 		}
 
 		return $count;
